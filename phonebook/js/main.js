@@ -173,6 +173,7 @@ const data = [
 
     const createRow = ({name: firstName, surname, phone}) => {
         const tr = document.createElement('tr');
+        tr.classList.add('contact');
 
         const tdDel = document.createElement('td');
 
@@ -236,6 +237,7 @@ const data = [
             list: table.tbody,
             logo,
             btnAdd: buttonGtoup.btns[0],
+            btnDel: buttonGtoup.btns[1],
             formOverlay: form.overlay,
             form: form.form,
         };
@@ -256,7 +258,14 @@ const data = [
     const init = (selectorApp, title) => {
         const app = document.querySelector(selectorApp);
         const phoneBook = renderPhoneBook(app, title);
-        const {list, logo, form, btnAdd, formOverlay} = phoneBook;
+        const {
+            list,
+            logo,
+            form,
+            btnAdd,
+            btnDel,
+            formOverlay,
+        } = phoneBook;
 
         // Функционал
         const allRow = renderContacts(list, data);
@@ -267,12 +276,25 @@ const data = [
             formOverlay.classList.add('is-visible');
         });
 
-        form.addEventListener('click', event => {
-            event.stopImmediatePropagation();
+        formOverlay.addEventListener('click', e => {
+            const target = e.target;
+            if (target === formOverlay ||
+                 target.closest('.close')) {
+                formOverlay.classList.remove('is-visible');
+            }
         });
 
-        formOverlay.addEventListener('click', () => {
-            formOverlay.classList.remove('is-visible');
+        btnDel.addEventListener('click', () => {
+            document.querySelectorAll('.delete').forEach(del => {
+                del.classList.toggle('is-visible');
+            });
+        });
+
+        list.addEventListener('click', e => {
+            const target = e.target;
+            if (target.closest('.del-icon')) {
+                target.closest('.contact').remove();
+            }
         });
     };
 
