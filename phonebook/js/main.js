@@ -1,34 +1,29 @@
 'use strict';
 
-const data = [
-    {
-        name: 'Иван',
-        surname: 'Петров',
-        phone: '+79514545454',
-    },
-    {
-        name: 'Игорь',
-        surname: 'Семёнов',
-        phone: '+79999999999',
-    },
-    {
-        name: 'Семён',
-        surname: 'Иванов',
-        phone: '+79800252525',
-    },
-    {
-        name: 'Мария',
-        surname: 'Попова',
-        phone: '+79876543210',
-    },
-];
+// const data = [
+//     {
+//         name: 'Иван',
+//         surname: 'Петров',
+//         phone: '+79514545454',
+//     },
+//     {
+//         name: 'Игорь',
+//         surname: 'Семёнов',
+//         phone: '+79999999999',
+//     },
+//     {
+//         name: 'Семён',
+//         surname: 'Иванов',
+//         phone: '+79800252525',
+//     },
+//     {
+//         name: 'Мария',
+//         surname: 'Попова',
+//         phone: '+79876543210',
+//     },
+// ];
 
 {
-    const addContactData = (contact) => {
-        data.push(contact);
-        console.log('data: ', data);
-    };
-
     const createContainer = () => {
         const container = document.createElement('div');
         container.classList.add('container');
@@ -176,6 +171,35 @@ const data = [
         };
     };
 
+    const getStorage = key => {
+        if (localStorage.getItem(key) !== null) {
+            return localStorage.getItem(key);
+        } else {
+            return [];
+        }
+    };
+
+    const setStorage = (key, obj) => {
+        let item;
+        try {
+            item = JSON.parse(getStorage(key));
+        } catch {
+            item = getStorage(key);
+        }
+        item.push(obj);
+        localStorage.setItem(key, JSON.stringify(item));
+    };
+
+    const removeStorage = phone => {
+        const newContactList = JSON.parse(getStorage('Contacts'));
+        for (let i = 0; i < newContactList.length; i++) {
+            if (newContactList[i].phone === phone) {
+                newContactList.splice(i, 1);
+            }
+        }
+        localStorage.setItem('Contacts', JSON.stringify(newContactList));
+    };
+
     const createRow = ({name: firstName, surname, phone}) => {
         const tr = document.createElement('tr');
         tr.classList.add('contact');
@@ -206,8 +230,14 @@ const data = [
         return tr;
     };
 
-    const renderContacts = (elem, data) => {
-        const allRow = data.map(createRow);
+    const renderContacts = (elem) => {
+        let item;
+        try {
+            item = JSON.parse(getStorage('Contacts'));
+        } catch {
+            item = getStorage('Contacts');
+        }
+        const allRow = item.map(createRow);
         elem.append(...allRow);
         return allRow;
     };
@@ -295,6 +325,9 @@ const data = [
             const target = e.target;
             if (target.closest('.del-icon')) {
                 target.closest('.contact').remove();
+                const removeContact = target.closest('.contact')
+                    .cells[3].textContent;
+                removeStorage(removeContact);
             }
         });
     };
@@ -311,7 +344,7 @@ const data = [
             const newContact = Object.fromEntries(formData);
 
             addContactPage(newContact, list);
-            addContactData(newContact);
+            setStorage('Contacts', newContact);
             form.reset();
             closeModal();
         });
@@ -329,7 +362,7 @@ const data = [
         } = renderPhoneBook(app, title);
 
         // Функционал
-        const allRow = renderContacts(list, data);
+        const allRow = renderContacts(list);
         const {closeModal} = modalControl(btnAdd, formOverlay);
 
         hoverRow(allRow, logo);
