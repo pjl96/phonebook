@@ -1,6 +1,6 @@
 
 import control from './modules/control.js';
-import * as render from './modules/render';
+import {renderContacts, renderPhoneBook} from './modules/render.js';
 
 {
     const init = (selectorApp, title) => {
@@ -12,10 +12,10 @@ import * as render from './modules/render';
             btnAdd,
             btnDel,
             formOverlay,
-        } = render.renderPhoneBook(app, title);
+        } = renderPhoneBook(app, title);
 
         // Функционал
-        const allRow = render.renderContacts(list);
+        const allRow = renderContacts(list);
         const {closeModal} = control.modalControl(btnAdd, formOverlay);
 
         control.hoverRow(allRow, logo);
